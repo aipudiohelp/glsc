@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. الإعدادات العامة (قم بتعديل رقم الواتساب المخصص للمبيعات هنا)
   const RFQ_CONFIG = {
     // رقم الواتساب الرسمي بصيغة دولية بدون علامة + (مثال: 9665xxxxxxxx)
-    salesWhatsAppNumber: "966500000000",
+    salesWhatsAppNumber: "966541544639",
     companyName: "شركة قمة الريادة الخليجية",
     salesOfficeCity: "المنطقة الشرقية"
   };
