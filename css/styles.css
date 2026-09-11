@@ -520,37 +520,40 @@ button, input, select {
 }
 
 /* ==========================================================================
-   7. كتالوج المواد والمواصفات (Materials Section) - دعم التمرير الأفقي للجوال
+   7. كتالوج المواد والمواصفات (إجبار التمرير الأفقي للجوال)
    ========================================================================== */
 .materials-section {
-  padding: 50px 0;
-  overflow: hidden; /* لمنع ظهور شريط تمرير بالصفحة كلها */
+  padding: 40px 0;
+  overflow: hidden;
 }
 
-/* تنسيق الجوال الافتراضي (شريط تمرير أفقي سلس) */
+/* شريط تمرير أفقي صارم للجوال */
 .materials-grid {
-  display: flex;
-  overflow-x: auto;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important; /* يمنع نزول أي كرت للسطر التالي نهائياً */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  gap: 16px;
-  padding: 10px 4px 20px 4px;
-  margin: 0 -20px; /* ليمتد التمرير حتى أطراف شاشة الموبايل */
-  padding-right: 20px;
-  padding-left: 20px;
-  scrollbar-width: none; /* إخفاء شريط التمرير في Firefox */
+  gap: 16px !important;
+  padding: 10px 20px 25px 20px !important;
+  margin-right: -20px !important;
+  margin-left: -20px !important;
+  scrollbar-width: none; /* إخفاء شريط التمرير في فايرفوكس */
 }
 
-/* إخفاء شريط التمرير في Chrome / Safari لمنظر شبيه بالتطبيقات */
 .materials-grid::-webkit-scrollbar {
-  display: none;
+  display: none; /* إخفاء شريط التمرير في كروم وسفاري */
 }
 
 /* بطاقة المادة في وضع الجوال */
 .material-card {
-  flex: 0 0 82%; /* عرض الكرت 82% ليظهر جزء من الكرت القادم لتشجيع السحب */
-  max-width: 320px;
-  scroll-snap-align: center;
+  flex: 0 0 82% !important; /* عرض الكرت 82% ليظهر طرف الكرت التالي */
+  width: 82% !important;
+  min-width: 270px !important;
+  max-width: 320px !important;
+  scroll-snap-align: start !important;
   background-color: var(--bg-card);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
@@ -693,27 +696,29 @@ button, input, select {
   border-color: var(--primary-navy);
 }
 
-/* العودة إلى وضع الشبكة (Grid) تلقائياً على التابلت والكمبيوتر */
+/* العودة إلى وضع الأعمدة العادية على الشاشات الكبيرة والكمبيوتر */
 @media (min-width: 768px) {
   .materials-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    overflow-x: visible;
-    padding: 0;
-    margin: 0;
-    gap: 24px;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    overflow-x: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 24px !important;
   }
 
   .material-card {
-    flex: unset;
-    max-width: none;
-    scroll-snap-align: unset;
+    flex: unset !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    scroll-snap-align: unset !important;
   }
 }
 
 @media (min-width: 1024px) {
   .materials-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr) !important;
   }
 }
 
