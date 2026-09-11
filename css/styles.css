@@ -519,30 +519,38 @@ button, input, select {
   line-height: 1.5;
 }
 
-/* 7. كتالوج المواد والمواصفات (Materials Section) */
+/* ==========================================================================
+   7. كتالوج المواد والمواصفات (Materials Section) - دعم التمرير الأفقي للجوال
+   ========================================================================== */
 .materials-section {
-  padding: 60px 0;
+  padding: 50px 0;
+  overflow: hidden; /* لمنع ظهور شريط تمرير بالصفحة كلها */
 }
 
+/* تنسيق الجوال الافتراضي (شريط تمرير أفقي سلس) */
 .materials-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 16px;
+  padding: 10px 4px 20px 4px;
+  margin: 0 -20px; /* ليمتد التمرير حتى أطراف شاشة الموبايل */
+  padding-right: 20px;
+  padding-left: 20px;
+  scrollbar-width: none; /* إخفاء شريط التمرير في Firefox */
 }
 
-@media (min-width: 640px) {
-  .materials-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* إخفاء شريط التمرير في Chrome / Safari لمنظر شبيه بالتطبيقات */
+.materials-grid::-webkit-scrollbar {
+  display: none;
 }
 
-@media (min-width: 1024px) {
-  .materials-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
+/* بطاقة المادة في وضع الجوال */
 .material-card {
+  flex: 0 0 82%; /* عرض الكرت 82% ليظهر جزء من الكرت القادم لتشجيع السحب */
+  max-width: 320px;
+  scroll-snap-align: center;
   background-color: var(--bg-card);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
@@ -592,7 +600,6 @@ button, input, select {
   position: relative;
 }
 
-/* تدرجات ألوان تمثل المواد بشكل احترافي */
 .sand-bg {
   background: linear-gradient(135deg, #e3a857 0%, #ba7b32 100%);
 }
@@ -684,6 +691,30 @@ button, input, select {
   background-color: var(--primary-navy);
   color: var(--text-white);
   border-color: var(--primary-navy);
+}
+
+/* العودة إلى وضع الشبكة (Grid) تلقائياً على التابلت والكمبيوتر */
+@media (min-width: 768px) {
+  .materials-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    overflow-x: visible;
+    padding: 0;
+    margin: 0;
+    gap: 24px;
+  }
+
+  .material-card {
+    flex: unset;
+    max-width: none;
+    scroll-snap-align: unset;
+  }
+}
+
+@media (min-width: 1024px) {
+  .materials-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* 8. القدرة التشغيلية والأسطول (Fleet Section) */
