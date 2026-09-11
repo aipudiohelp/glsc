@@ -1,21 +1,18 @@
 /**
  * ==========================================================================
  * شركة قمة الريادة الخليجية - GLSC
- * Script: RFQ Filter & WhatsApp Lead Generator (B2B Conversion Engine)
+ * Script: RFQ Filter & Instant Material Auto-Selector
  * ==========================================================================
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 1. الإعدادات العامة (قم بتعديل رقم الواتساب المخصص للمبيعات هنا)
   const RFQ_CONFIG = {
-    // رقم الواتساب الرسمي بصيغة دولية بدون علامة + (مثال: 9665xxxxxxxx)
-    salesWhatsAppNumber: "966541544639",
+    salesWhatsAppNumber: "966541544639", // ضع رقم المبيعات الفعلي هنا
     companyName: "شركة قمة الريادة الخليجية",
     salesOfficeCity: "المنطقة الشرقية"
   };
 
-  // 2. تحديد عناصر واجهة المستخدم
   const rfqForm = document.getElementById('rfqForm');
   const materialSelect = document.getElementById('materialType');
   const volumeSelect = document.getElementById('orderVolume');
@@ -26,45 +23,57 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardQuoteButtons = document.querySelectorAll('.btn-card-quote');
 
   // ==========================================================================
-  // 3. ربط أزرار بطاقات الكتالوج بالنموذج التفاعلي (Direct Catalog Linkage)
+  // الاختيار التلقائي الصارم للمادة والانتقال لحقل الكمية مباشرة
   // ==========================================================================
-  // عند ضغط المقاول على زر "طلب تسعير هذه المادة" في الكتالوج:
-  // يتم نقله تلقائياً للنموذج وتحديد المادة المطلوبة مسبقاً
-  if (cardQuoteButtons.length > 0) {
+  if (cardQuoteButtons.length > 0 && materialSelect) {
     cardQuoteButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', function(e) {
         e.preventDefault();
-        const selectedMaterial = btn.getAttribute('data-material');
+        e.stopPropagation();
 
-        if (materialSelect && selectedMaterial) {
-          // محاولة اختيار القيمة المتطابقة في القائمة المنسدلة
-          let optionFound = false;
-          for (let i = 0; i < materialSelect.options.length; i++) {
-            if (materialSelect.options[i].value.includes(selectedMaterial) || selectedMaterial.includes(materialSelect.options[i].value)) {
-              materialSelect.selectedIndex = i;
-              optionFound = true;
-              break;
-            }
-          }
+        const selectedMaterial = this.getAttribute('data-material');
+        if (!selectedMaterial) return;
 
-          // إذا لم يجد تطابقاً حرفياً، يضع القيمة مباشرة
-          if (!optionFound) {
-            materialSelect.value = selectedMaterial;
+        // 1. تثبيت اختيار المادة في القائمة المنسدلة بدقة
+        let isSelected = false;
+        for (let i = 0; i < materialSelect.options.length; i++) {
+          if (materialSelect.options[i].value.trim() === selectedMaterial.trim()) {
+            materialSelect.selectedIndex = i;
+            isSelected = true;
+            break;
           }
         }
 
-        // تمرير سلس ومريح إلى نموذج التسعير
+        if (!isSelected) {
+          materialSelect.value = selectedMaterial;
+        }
+
+        // إشعار المتصفح بحدوث تغيير فعلي في القائمة
+        materialSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // 2. تمييز الحقل بلون أخضر تأكيدي للعميل أن المادة تم تحديدها
+        materialSelect.style.border = '2px solid #27ae60';
+        materialSelect.style.backgroundColor = '#f0fdf4';
+
+        // 3. التمرير السلس إلى نموذج التسعير
         if (rfqFunnelSection) {
-          rfqFunnelSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          
-          // تركيز وتنبيه بصري على حقل اختيار المادة
+          const headerOffset = 80;
+          const elementPosition = rfqFunnelSection.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+
+          // 4. نقل التركيز تلقائياً للخانة التالية (حجم التوريد) بعد انتهاء التمرير
           setTimeout(() => {
-            if (materialSelect) {
-              materialSelect.focus();
-              materialSelect.style.borderColor = 'var(--accent-gold)';
+            if (volumeSelect) {
+              volumeSelect.focus();
+              volumeSelect.style.border = '2px solid var(--accent-gold)';
               setTimeout(() => {
-                materialSelect.style.borderColor = '';
-              }, 1500);
+                volumeSelect.style.border = '';
+              }, 2000);
             }
           }, 600);
         }
@@ -73,29 +82,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // 4. معالجة وتوليد رسالة التسعير الرسمية عند إرسال النموذج (Form Submit)
+  // معالجة وإرسال رسالة الواتساب الرسمية
   // ==========================================================================
   if (rfqForm) {
-    rfqForm.addEventListener('submit', (event) => {
-      event.preventDefault();
+    rfqForm.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-      // استخراج وتنظيف المدخلات
       const material = materialSelect ? materialSelect.value.trim() : '';
       const volume = volumeSelect ? volumeSelect.value.trim() : '';
       const location = locationInput ? locationInput.value.trim() : '';
-      const company = companyInput && companyInput.value.trim() !== '' 
+      const company = (companyInput && companyInput.value.trim() !== '') 
         ? companyInput.value.trim() 
         : 'مشروع مقاولات / عميل B2B';
 
-      // التحقق من الحقول الأساسية
-      if (!material || !volume || !location) {
-        alert('فضلاً اختر نوع المادة، حجم التوريد التقديري، وموقع المشروع لمتابعة التسعير.');
+      if (!material) {
+        alert('فضلاً اختر نوع مادة الدفان المطلوبة.');
+        materialSelect.focus();
+        return;
+      }
+      if (!volume) {
+        alert('فضلاً اختر حجم التوريد التقديري (بالردود).');
+        volumeSelect.focus();
+        return;
+      }
+      if (!location) {
+        alert('فضلاً حدد موقع المشروع في المنطقة الشرقية.');
+        locationInput.focus();
         return;
       }
 
-      // بناء قالب رسالة الواتساب المهنية (Saudi B2B Format)
-      // الرسالة مصممة لتفرض نمط محادثة تجارية وتلغي أي طابع للدردشة العشوائية أو التوظيف
-      const messageBody = 
+      const messageText = 
 `السلام عليكم ورحمة الله وبركاته
 إدارة المبيعات - ${RFQ_CONFIG.companyName}
 
@@ -106,78 +122,37 @@ document.addEventListener('DOMContentLoaded', () => {
 • موقع المشروع: ${location}
 • اسم الجهة / المقاول: ${company}
 ━━━━━━━━━━━━━━━━━━━━━
-نأمل تزويدنا بسعر الرد شامل التوصيل للموقع المذكور وجدول التوريد المتاح لديكم.`;
+نأمل تزويدنا بسعر الرد شامل التوصيل لموقع العمل وجدول التوريد المتاح.`;
 
-      // تشفير النص ليكون متوافقاً مع روابط الويب
-      const encodedMessage = encodeURIComponent(messageBody);
-      const whatsappUrl = `https://wa.me/${RFQ_CONFIG.salesWhatsAppNumber}?text=${encodedMessage}`;
+      const whatsappUrl = `https://wa.me/${RFQ_CONFIG.salesWhatsAppNumber}?text=${encodeURIComponent(messageText)}`;
 
-      // إطلاق حدث التتبع للمنصات الإعلانية (Meta Pixel / Google Ads)
-      triggerLeadTracking({
-        leadType: 'RFQ_Form_Submission',
-        material: material,
-        volume: volume,
-        location: location
-      });
+      if (typeof window.trackB2BConversion === 'function') {
+        window.trackB2BConversion('Lead', { material, volume, location });
+      }
 
-      // توجيه العميل فوراً إلى تطبيق واتساب
       window.open(whatsappUrl, '_blank');
     });
   }
 
   // ==========================================================================
-  // 5. إدارة زر الواتساب في الشريط السفلي الثابت (Sticky Mobile WhatsApp)
+  // زر الواتساب في الشريط السفلي للجوال
   // ==========================================================================
   if (stickyWhatsAppBtn) {
     stickyWhatsAppBtn.addEventListener('click', () => {
-      // فحص ما إذا كان العميل قد أدخل بيانات في النموذج بالفعل
-      const hasEnteredData = locationInput && locationInput.value.trim() !== '';
+      const isMaterialChosen = materialSelect && materialSelect.value !== '';
+      const isLocationEntered = locationInput && locationInput.value.trim() !== '';
 
-      if (!hasEnteredData && rfqFunnelSection) {
-        // توجيهه للنموذج أولاً لفلترة طلبه قبل فتح الواتساب
+      if ((!isMaterialChosen || !isLocationEntered) && rfqFunnelSection) {
         rfqFunnelSection.scrollIntoView({ behavior: 'smooth' });
-        if (locationInput) {
-          setTimeout(() => locationInput.focus(), 600);
+        if (!isMaterialChosen) {
+          materialSelect.focus();
+        } else {
+          locationInput.focus();
         }
       } else if (rfqForm) {
-        // إذا كانت البيانات مكتملة، يتم إرسال النموذج تلقائياً
         rfqForm.requestSubmit();
-      } else {
-        // توجيه مباشر برسالة افتتاحية محددة لقطاع المقاولات فقط
-        const defaultMessage = encodeURIComponent(
-`السلام عليكم، مطلوب تسعير توريد مواد دفان لمشروع بالمنطقة الشرقية.
-يرجى توضيح أسعار التريلات ومواعيد التوريد المتاحة.`
-        );
-        window.open(`https://wa.me/${RFQ_CONFIG.salesWhatsAppNumber}?text=${defaultMessage}`, '_blank');
       }
     });
-  }
-
-  // ==========================================================================
-  // 6. دالة استدعاء التتبع الآمن (Tracking Dispatcher)
-  // ==========================================================================
-  function triggerLeadTracking(data) {
-    // التحقق من وجود دالة التتبع المعرفة في ملف tracker.js
-    if (typeof window.trackB2BConversion === 'function') {
-      window.trackB2BConversion('Lead', data);
-    } else {
-      // إرسال مباشر إلى Meta Pixel في حال كان مفعّلاً ومحقوناً
-      if (typeof window.fbq === 'function') {
-        window.fbq('track', 'Lead', {
-          content_name: data.material,
-          content_category: 'Backfill Supply',
-          value: 1.00,
-          currency: 'SAR'
-        });
-      }
-      // إرسال إلى Google Analytics / Ads إذا كان مفعّلاً
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', 'generate_lead', {
-          event_category: 'B2B RFQ',
-          event_label: data.material
-        });
-      }
-    }
   }
 
 });
