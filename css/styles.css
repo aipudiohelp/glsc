@@ -588,44 +588,41 @@ button, input, select {
   z-index: 5;
 }
 
+/* تنسيق صور كروت المواد */
 .card-media {
-  height: 140px;
+  height: 155px;
   width: 100%;
   position: relative;
+  overflow: hidden;
+  background-color: #0e2238;
 }
 
-.card-placeholder {
+.card-img {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: flex-end;
-  padding: 12px;
-  position: relative;
+  object-fit: cover;
+  object-position: center 60%; /* للتركيز على صلب القلاب وكومة التفريغ */
+  display: block;
+  transition: transform 0.4s ease;
 }
 
-.sand-bg {
-  background: linear-gradient(135deg, #e3a857 0%, #ba7b32 100%);
-}
-
-.subbase-bg {
-  background: linear-gradient(135deg, #7f8c8d 0%, #4b5358 100%);
-}
-
-.gravel-bg {
-  background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
-}
-
-.soil-bg {
-  background: linear-gradient(135deg, #8d6e63 0%, #4e342e 100%);
+.material-card:hover .card-img {
+  transform: scale(1.06); /* تكبير ناعم للصورة عند مرور الماوس */
 }
 
 .badge-usage {
-  background-color: rgba(0, 0, 0, 0.65);
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(14, 34, 56, 0.88);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 4px;
+  z-index: 3;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .card-body {
