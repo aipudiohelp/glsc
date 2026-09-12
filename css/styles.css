@@ -522,7 +522,7 @@ button, input, select {
    7. كتالوج المواد والمواصفات (تمرير أفقي صارم + ضبط كادر الصور الإنشائية)
    ========================================================================== */
 .materials-section {
-  padding: 45px 0;
+  padding: 40px 0;
   overflow: hidden;
 }
 
@@ -587,9 +587,9 @@ button, input, select {
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* نافذة الصورة: ارتفاع مثالي وضبط الكاميرا للتركيز على تفريغ الدفان والقلاب */
+/* نافذة الصورة: ارتفاع 150px متناسق مع حجم الكارت الأصلي */
 .card-media {
-  height: 195px !important;
+  height: 150px !important;
   width: 100% !important;
   position: relative;
   overflow: hidden;
@@ -600,13 +600,8 @@ button, input, select {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  object-position: center 76% !important; /* ينزل بالكاميرا للأسفل ليركز على صلب القلاب والمواد المفرغة */
+  object-position: center 72% !important;
   display: block;
-  transition: transform 0.4s ease;
-}
-
-.material-card:hover .card-img {
-  transform: scale(1.05);
 }
 
 .badge-usage {
@@ -617,7 +612,7 @@ button, input, select {
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-radius: 4px;
   z-index: 4;
   backdrop-filter: blur(4px);
