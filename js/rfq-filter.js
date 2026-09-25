@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       if (!volumeOrArea) {
-        alert('فضلاً اختر حجم التوريد أو المساحة التقديرية.');
+        alert('فضلاً اختر حجم التوريد أو المساحة التقديرية لمشروعك.');
         volumeSelect.focus();
         return;
       }
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Format WhatsApp Message
+      // تجهيز نص رسالة الواتساب الرسمية الشاملة للدفان والتشطيب
       const messageText = 
 `السلام عليكم ورحمة الله وبركاته
 إدارة المشاريع والمبيعات - ${RFQ_CONFIG.companyName}
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const whatsappUrl = `https://wa.me/${RFQ_CONFIG.salesWhatsAppNumber}?text=${encodeURIComponent(messageText)}`;
 
-      // Meta Pixel Lead Event Tracking
+      // تتبع الحدث في Meta Pixel
       if (typeof fbq === 'function') {
         fbq('track', 'Lead', {
           content_name: itemChosen,
@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      // تتبع الحدث المخصص إن وجد
       if (typeof window.trackB2BConversion === 'function') {
         window.trackB2BConversion('Lead', { itemChosen, volumeOrArea, location });
       }
