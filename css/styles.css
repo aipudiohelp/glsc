@@ -251,6 +251,7 @@ button, input, select {
 /* 5. قسم الواجهة الأساسي مع صورة الخلفية (Hero Section + Hero BG) */
 .hero-section {
   position: relative;
+  /* دمج التظليل الكحلي مع صورة الخلفية hero-bg.svg */
   background-color: #0a192a;
   background-image: 
     linear-gradient(180deg, rgba(10, 25, 42, 0.82) 0%, rgba(14, 34, 56, 0.88) 55%, rgba(14, 34, 56, 0.98) 100%),
@@ -531,7 +532,9 @@ button, input, select {
   line-height: 1.5;
 }
 
-/* 7. كتالوج المواد والمواصفات (تمرير أفقي صارم + كروت متناسقة) */
+/* ==========================================================================
+   7. كتالوج المواد والمواصفات (تمرير أفقي صارم + كروت متناسقة)
+   ========================================================================== */
 .materials-section {
   padding: 40px 0;
   overflow: hidden;
@@ -598,7 +601,7 @@ button, input, select {
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* نافذة الصورة: ارتفاع 150px متناسق */
+/* نافذة الصورة: ارتفاع 150px متناسق مع كادر التفريغ */
 .card-media {
   height: 150px !important;
   width: 100% !important;
@@ -1315,7 +1318,7 @@ button, input, select {
   stroke: #ffde94;
 }
 
-/* تنسيق شبكة كروت التشطيبات للشاشات الكبيرة لتوزيع الكروت الخمسة بتوازن */
+/* توزيع كروت التشطيبات الخمسة بتوازن هندسي على الشاشات الكبيرة */
 @media (min-width: 1024px) {
   .finishing-section .materials-grid {
     grid-template-columns: repeat(3, 1fr) !important;
