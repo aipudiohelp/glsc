@@ -1339,3 +1339,18 @@ optgroup option {
   background-color: #ffffff;
   padding: 6px 10px;
 }
+
+/* تنسيق شعار الشركة الرسمي في الهيدر */
+.site-logo-img {
+  height: 46px;
+  width: auto;
+  max-width: 130px;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .site-logo-img {
+    height: 38px;
+  }
+}
