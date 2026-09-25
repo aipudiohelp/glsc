@@ -1,14 +1,14 @@
 /**
  * ==========================================================================
  * شركة قمة الريادة الخليجية - GLSC
- * Script: RFQ Filter & Instant Material Auto-Selector
+ * Script: RFQ Filter & Instant Material/Service Auto-Selector
  * ==========================================================================
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   const RFQ_CONFIG = {
-    salesWhatsAppNumber: "966541544639", // ضع رقم المبيعات الفعلي هنا
+    salesWhatsAppNumber: "966541544639",
     companyName: "شركة قمة الريادة الخليجية",
     salesOfficeCity: "المنطقة الشرقية"
   };
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardQuoteButtons = document.querySelectorAll('.btn-card-quote');
 
   // ==========================================================================
-  // الاختيار التلقائي الصارم للمادة والانتقال لحقل الكمية مباشرة
+  // الاختيار التلقائي الصارم للمادة/الخدمة والانتقال لحقل الكمية/المساحة مباشرة
   // ==========================================================================
   if (cardQuoteButtons.length > 0 && materialSelect) {
     cardQuoteButtons.forEach(btn => {
@@ -31,13 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         e.stopPropagation();
 
-        const selectedMaterial = this.getAttribute('data-material');
-        if (!selectedMaterial) return;
+        const selectedItem = this.getAttribute('data-material');
+        if (!selectedItem) return;
 
-        // 1. تثبيت اختيار المادة في القائمة المنسدلة بدقة
+        // 1. تثبيت اختيار الخدمة أو المادة في القائمة المنسدلة بدقة
         let isSelected = false;
         for (let i = 0; i < materialSelect.options.length; i++) {
-          if (materialSelect.options[i].value.trim() === selectedMaterial.trim()) {
+          if (materialSelect.options[i].value.trim() === selectedItem.trim()) {
             materialSelect.selectedIndex = i;
             isSelected = true;
             break;
@@ -45,13 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!isSelected) {
-          materialSelect.value = selectedMaterial;
+          materialSelect.value = selectedItem;
         }
 
         // إشعار المتصفح بحدوث تغيير فعلي في القائمة
         materialSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
-        // 2. تمييز الحقل بلون أخضر تأكيدي للعميل أن المادة تم تحديدها
+        // 2. تمييز الحقل بلون أخضر تأكيدي
         materialSelect.style.border = '2px solid #27ae60';
         materialSelect.style.backgroundColor = '#f0fdf4';
 
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             behavior: 'smooth'
           });
 
-          // 4. نقل التركيز تلقائياً للخانة التالية (حجم التوريد) بعد انتهاء التمرير
+          // 4. نقل التركيز تلقائياً للخانة التالية (حجم التوريد أو المساحة)
           setTimeout(() => {
             if (volumeSelect) {
               volumeSelect.focus();
@@ -88,20 +88,20 @@ document.addEventListener('DOMContentLoaded', () => {
     rfqForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const material = materialSelect ? materialSelect.value.trim() : '';
-      const volume = volumeSelect ? volumeSelect.value.trim() : '';
+      const itemChosen = materialSelect ? materialSelect.value.trim() : '';
+      const volumeOrArea = volumeSelect ? volumeSelect.value.trim() : '';
       const location = locationInput ? locationInput.value.trim() : '';
       const company = (companyInput && companyInput.value.trim() !== '') 
         ? companyInput.value.trim() 
         : 'مشروع مقاولات / عميل B2B';
 
-      if (!material) {
-        alert('فضلاً اختر نوع مادة الدفان المطلوبة.');
+      if (!itemChosen) {
+        alert('فضلاً اختر نوع الخدمة أو مادة الدفان المطلوبة.');
         materialSelect.focus();
         return;
       }
-      if (!volume) {
-        alert('فضلاً اختر حجم التوريد التقديري (بالردود).');
+      if (!volumeOrArea) {
+        alert('فضلاً اختر حجم التوريد أو المساحة التقديرية.');
         volumeSelect.focus();
         return;
       }
@@ -111,23 +111,33 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Format WhatsApp Message
       const messageText = 
 `السلام عليكم ورحمة الله وبركاته
-إدارة المبيعات - ${RFQ_CONFIG.companyName}
+إدارة المشاريع والمبيعات - ${RFQ_CONFIG.companyName}
 
-طلب تسعير رسمي لتوريد مواد دفان (${RFQ_CONFIG.salesOfficeCity}):
+طلب تسعير رسمي (${RFQ_CONFIG.salesOfficeCity}):
 ━━━━━━━━━━━━━━━━━━━━━
-• نوع المادة: ${material}
-• حجم الطلب التقديري: ${volume}
+• الخدمة / المادة: ${itemChosen}
+• الحجم / المساحة: ${volumeOrArea}
 • موقع المشروع: ${location}
 • اسم الجهة / المقاول: ${company}
 ━━━━━━━━━━━━━━━━━━━━━
-نأمل تزويدنا بسعر الرد شامل التوصيل لموقع العمل وجدول التوريد المتاح.`;
+نأمل تزويدنا بعرض السعر وجدول التوريد/التنفيذ المتاح.`;
 
       const whatsappUrl = `https://wa.me/${RFQ_CONFIG.salesWhatsAppNumber}?text=${encodeURIComponent(messageText)}`;
 
+      // Meta Pixel Lead Event Tracking
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', {
+          content_name: itemChosen,
+          content_category: volumeOrArea,
+          status: 'Direct_WhatsApp_RFQ'
+        });
+      }
+
       if (typeof window.trackB2BConversion === 'function') {
-        window.trackB2BConversion('Lead', { material, volume, location });
+        window.trackB2BConversion('Lead', { itemChosen, volumeOrArea, location });
       }
 
       window.open(whatsappUrl, '_blank');
@@ -139,12 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   if (stickyWhatsAppBtn) {
     stickyWhatsAppBtn.addEventListener('click', () => {
-      const isMaterialChosen = materialSelect && materialSelect.value !== '';
+      const isItemChosen = materialSelect && materialSelect.value !== '';
       const isLocationEntered = locationInput && locationInput.value.trim() !== '';
 
-      if ((!isMaterialChosen || !isLocationEntered) && rfqFunnelSection) {
+      if ((!isItemChosen || !isLocationEntered) && rfqFunnelSection) {
         rfqFunnelSection.scrollIntoView({ behavior: 'smooth' });
-        if (!isMaterialChosen) {
+        if (!isItemChosen) {
           materialSelect.focus();
         } else {
           locationInput.focus();
