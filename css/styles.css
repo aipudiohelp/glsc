@@ -1354,3 +1354,25 @@ optgroup option {
     height: 38px;
   }
 }
+
+
+/* ضبط ظهور الشعار في أقصى اليمين */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.site-logo-img {
+  height: 52px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .site-logo-img {
+    height: 42px;
+  }
+}
